@@ -1,0 +1,8 @@
+# Ignore everything by default
+*
+
+# Allow only these
+!.gitignore
+!README.md
+!demo-Java/
+!demo-Java/**
