@@ -1,0 +1,129 @@
+{% extends 'career_edu/base.html' %}
+
+{% block title %}<title>{{ career.title }} - CareerPath</title>{% endblock %}
+{% block nav_careers %}active{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'career-home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'career-explore' %}">Careers</a></li>
+            <li class="breadcrumb-item active">{{ career.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <div class="card p-4 mb-4">
+                <div class="d-flex align-items-start gap-4 mb-4">
+                    <div class="domain-icon flex-shrink-0" style="width:64px;height:64px;font-size:2rem;
+                         background:{% if career.domain == 'technology' %}#ede9fe{% elif career.domain == 'business' %}#dcfce7{% elif career.domain == 'arts' %}#fce7f3{% elif career.domain == 'finance' %}#fef3c7{% elif career.domain == 'healthcare' %}#dbeafe{% else %}#ffedd5{% endif %}">
+                        <i class="bi bi-{{ career.icon }}"
+                           style="color:{% if career.domain == 'technology' %}#6d28d9{% elif career.domain == 'business' %}#166534{% elif career.domain == 'arts' %}#9d174d{% elif career.domain == 'finance' %}#92400e{% elif career.domain == 'healthcare' %}#1e40af{% else %}#9a3412{% endif %}"></i>
+                    </div>
+                    <div>
+                        <h2 class="fw-bold mb-2">{{ career.title }}</h2>
+                        <span class="badge rounded-pill px-3 py-1" style="font-size:.85rem;background:{% if career.domain == 'technology' %}#ede9fe{% elif career.domain == 'business' %}#dcfce7{% elif career.domain == 'arts' %}#fce7f3{% elif career.domain == 'finance' %}#fef3c7{% elif career.domain == 'healthcare' %}#dbeafe{% else %}#ffedd5{% endif %};color:{% if career.domain == 'technology' %}#6d28d9{% elif career.domain == 'business' %}#166534{% elif career.domain == 'arts' %}#9d174d{% elif career.domain == 'finance' %}#92400e{% elif career.domain == 'healthcare' %}#1e40af{% else %}#9a3412{% endif %}">
+                            {{ career.get_domain_display }}
+                        </span>
+                    </div>
+                </div>
+
+                <h5 class="fw-bold mb-2">About this Career</h5>
+                <p class="text-muted mb-4">{{ career.description }}</p>
+
+                <h5 class="fw-bold mb-3">Required Skills</h5>
+                <div class="mb-4">
+                    {% for skill in career.skills_list %}
+                        <span class="skill-tag me-1 mb-1">{{ skill }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <div class="border rounded-3 p-3">
+                            <p class="text-muted small mb-1"><i class="bi bi-currency-dollar me-1"></i>Average Salary</p>
+                            <h6 class="fw-bold mb-0 text-success">{{ career.avg_salary }}</h6>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="border rounded-3 p-3">
+                            <p class="text-muted small mb-1"><i class="bi bi-graph-up me-1"></i>Growth Outlook</p>
+                            <h6 class="fw-bold mb-0 text-primary">{{ career.growth_outlook }}</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Related Resources -->
+            {% if resources %}
+            <div class="card p-4">
+                <h5 class="fw-bold mb-3">
+                    <i class="bi bi-book-fill me-2 text-success"></i>Learning Resources for {{ career.title }}
+                </h5>
+                <div class="row g-3">
+                    {% for resource in resources %}
+                    <div class="col-sm-6">
+                        <div class="border rounded-3 p-3 h-100">
+                            <div class="d-flex gap-1 mb-2">
+                                <span class="badge {% if resource.is_free %}badge-free{% else %}badge-paid{% endif %} rounded-pill small">
+                                    {% if resource.is_free %}Free{% else %}Paid{% endif %}
+                                </span>
+                                <span class="badge bg-light text-dark rounded-pill small">{{ resource.get_difficulty_display }}</span>
+                                <span class="badge bg-light text-secondary rounded-pill small">{{ resource.get_resource_type_display }}</span>
+                            </div>
+                            <h6 class="fw-semibold small mb-1">{{ resource.title }}</h6>
+                            <p class="text-muted mb-1" style="font-size:.8rem">{{ resource.provider }}</p>
+                            <p class="text-muted mb-2" style="font-size:.78rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">
+                                {{ resource.description }}
+                            </p>
+                            {% if resource.duration %}
+                                <p class="small mb-2"><i class="bi bi-clock me-1 text-primary"></i>{{ resource.duration }}</p>
+                            {% endif %}
+                            {% if resource.url %}
+                                <a href="{{ resource.url }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-success w-100">
+                                    <i class="bi bi-box-arrow-up-right me-1"></i>View Resource
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <div class="card p-4 mb-3">
+                <h6 class="fw-bold mb-3">Quick Actions</h6>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'career-profile' %}" class="btn btn-primary w-100 mb-2">
+                        <i class="bi bi-star me-1"></i>Add to My Interests
+                    </a>
+                    <a href="{% url 'education-resources' %}?domain={{ career.domain }}" class="btn btn-outline-primary w-100">
+                        <i class="bi bi-book me-1"></i>Browse {{ career.get_domain_display }} Resources
+                    </a>
+                {% else %}
+                    <p class="text-muted small mb-3">Sign in to save this career to your interests and get personalized recommendations.</p>
+                    <a href="{% url 'register' %}" class="btn btn-primary w-100 mb-2">Create Free Account</a>
+                    <a href="{% url 'login' %}" class="btn btn-outline-primary w-100">Sign In</a>
+                {% endif %}
+            </div>
+
+            <div class="card p-4">
+                <h6 class="fw-bold mb-3">Explore More Careers</h6>
+                <a href="{% url 'career-explore' %}?domain={{ career.domain }}" class="btn btn-outline-secondary w-100 mb-2 text-start">
+                    <i class="bi bi-grid me-2"></i>More {{ career.get_domain_display }} Careers
+                </a>
+                <a href="{% url 'career-explore' %}" class="btn btn-outline-secondary w-100 text-start">
+                    <i class="bi bi-compass me-2"></i>All Career Paths
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

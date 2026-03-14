@@ -1,0 +1,181 @@
+{% extends 'career_edu/base.html' %}
+
+{% block title %}<title>My Dashboard - CareerPath</title>{% endblock %}
+{% block nav_dashboard %}active{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+
+    <!-- Welcome Header -->
+    <div class="row align-items-center mb-4">
+        <div class="col">
+            <h2 class="fw-bold mb-1">
+                Welcome back, <span style="color:var(--primary)">{{ user.username }}</span>! 👋
+            </h2>
+            <p class="text-muted mb-0">Here's your personalized career & education overview.</p>
+        </div>
+        <div class="col-auto">
+            <a href="{% url 'career-profile' %}" class="btn btn-outline-primary">
+                <i class="bi bi-pencil me-1"></i>Update Profile
+            </a>
+        </div>
+    </div>
+
+    <!-- Profile Completion Alert -->
+    {% if not profile.education_level or not profile.current_skills %}
+    <div class="alert alert-warning border-0 rounded-3 mb-4 d-flex align-items-center gap-3">
+        <i class="bi bi-exclamation-triangle-fill fs-4 flex-shrink-0"></i>
+        <div>
+            <strong>Complete your profile</strong> to get better personalized recommendations!
+            <a href="{% url 'career-profile' %}" class="alert-link ms-2">Complete Now →</a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Quick Stats -->
+    <div class="row g-3 mb-5">
+        <div class="col-6 col-md-3">
+            <div class="card p-3 text-center border-0" style="background:linear-gradient(135deg,#ede9fe,#ddd6fe)">
+                <i class="bi bi-briefcase-fill fs-2 mb-1" style="color:#6d28d9"></i>
+                <h4 class="fw-bold mb-0" style="color:#4f46e5">{{ total_careers }}</h4>
+                <small class="text-muted">Career Paths</small>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card p-3 text-center border-0" style="background:linear-gradient(135deg,#dcfce7,#bbf7d0)">
+                <i class="bi bi-book-fill fs-2 mb-1" style="color:#166534"></i>
+                <h4 class="fw-bold mb-0" style="color:#166534">{{ total_resources }}</h4>
+                <small class="text-muted">Resources</small>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card p-3 text-center border-0" style="background:linear-gradient(135deg,#dbeafe,#bfdbfe)">
+                <i class="bi bi-star-fill fs-2 mb-1" style="color:#1e40af"></i>
+                <h4 class="fw-bold mb-0" style="color:#1e40af">{{ profile.interests.count }}</h4>
+                <small class="text-muted">My Interests</small>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card p-3 text-center border-0" style="background:linear-gradient(135deg,#fef3c7,#fde68a)">
+                <i class="bi bi-tools fs-2 mb-1" style="color:#92400e"></i>
+                <h4 class="fw-bold mb-0" style="color:#92400e">{{ profile.skills_list|length }}</h4>
+                <small class="text-muted">Skills Listed</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Profile Summary -->
+        <div class="col-lg-4">
+            <div class="card h-100 p-4">
+                <h5 class="fw-bold mb-3"><i class="bi bi-person-circle me-2 text-primary"></i>My Profile</h5>
+                <div class="mb-3">
+                    <span class="text-muted small d-block mb-1">Education Level</span>
+                    <strong>{{ profile.get_education_level_display|default:"Not set" }}</strong>
+                </div>
+                <div class="mb-3">
+                    <span class="text-muted small d-block mb-1">Experience</span>
+                    <strong>{{ profile.get_experience_level_display|default:"Not set" }}</strong>
+                </div>
+                <div class="mb-3">
+                    <span class="text-muted small d-block mb-1">Target Role</span>
+                    <strong>{{ profile.target_role|default:"Not set" }}</strong>
+                </div>
+                {% if profile.skills_list %}
+                <div class="mb-3">
+                    <span class="text-muted small d-block mb-2">My Skills</span>
+                    {% for skill in profile.skills_list %}
+                        <span class="skill-tag">{{ skill }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% if profile.bio %}
+                <div class="mb-3">
+                    <span class="text-muted small d-block mb-1">About Me</span>
+                    <p class="small mb-0">{{ profile.bio }}</p>
+                </div>
+                {% endif %}
+                <a href="{% url 'career-profile' %}" class="btn btn-outline-primary btn-sm w-100 mt-auto">
+                    <i class="bi bi-pencil me-1"></i>Edit Profile
+                </a>
+            </div>
+        </div>
+
+        <!-- Recommended Careers -->
+        <div class="col-lg-8">
+            <div class="card p-4 mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0"><i class="bi bi-compass-fill me-2 text-primary"></i>Recommended Careers</h5>
+                    <a href="{% url 'career-explore' %}" class="text-primary small">View All →</a>
+                </div>
+                {% if recommended_careers %}
+                <div class="row g-3">
+                    {% for career in recommended_careers %}
+                    <div class="col-sm-6">
+                        <div class="border rounded-3 p-3 h-100">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="bi bi-{{ career.icon }} text-primary"></i>
+                                <h6 class="fw-semibold mb-0 small">{{ career.title }}</h6>
+                            </div>
+                            <div class="d-flex justify-content-between small text-muted mb-2">
+                                <span>{{ career.get_domain_display }}</span>
+                            </div>
+                            <p class="text-muted mb-2" style="font-size:.75rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">
+                                {{ career.description }}
+                            </p>
+                            <small class="text-success fw-semibold"><i class="bi bi-currency-dollar"></i>{{ career.avg_salary }}</small>
+                            <div class="mt-2">
+                                <a href="{% url 'career-detail' career.pk %}" class="btn btn-sm btn-outline-primary py-0 px-2">Details</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-4 text-muted">
+                    <i class="bi bi-compass fs-2 mb-2 d-block"></i>
+                    <p>No recommendations yet. <a href="{% url 'career-profile' %}">Update your profile</a> to get personalized career suggestions.</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Recommended Resources -->
+            <div class="card p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold mb-0"><i class="bi bi-book-fill me-2 text-success"></i>Recommended Resources</h5>
+                    <a href="{% url 'education-resources' %}" class="text-primary small">View All →</a>
+                </div>
+                {% if recommended_resources %}
+                <div class="row g-3">
+                    {% for resource in recommended_resources %}
+                    <div class="col-sm-6">
+                        <div class="border rounded-3 p-3 h-100">
+                            <div class="d-flex gap-1 mb-1">
+                                <span class="badge {% if resource.is_free %}badge-free{% else %}badge-paid{% endif %} rounded-pill" style="font-size:.7rem">
+                                    {% if resource.is_free %}Free{% else %}Paid{% endif %}
+                                </span>
+                                <span class="badge bg-light text-dark rounded-pill" style="font-size:.7rem">{{ resource.get_difficulty_display }}</span>
+                            </div>
+                            <h6 class="fw-semibold small mb-1">{{ resource.title }}</h6>
+                            <p class="text-muted mb-1" style="font-size:.75rem">{{ resource.provider }}</p>
+                            {% if resource.duration %}
+                                <p class="mb-2" style="font-size:.75rem"><i class="bi bi-clock me-1 text-primary"></i>{{ resource.duration }}</p>
+                            {% endif %}
+                            {% if resource.url %}
+                                <a href="{{ resource.url }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-success py-0 px-2" style="font-size:.75rem">Open →</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-4 text-muted">
+                    <i class="bi bi-book fs-2 mb-2 d-block"></i>
+                    <p>Update your profile with interests to get resource recommendations.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
