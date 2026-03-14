@@ -1,0 +1,214 @@
+{% extends 'career_edu/base.html' %}
+
+{% block title %}<title>CareerPath - Your Personalized Career & Education Portal</title>{% endblock %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<section class="bg-gradient-primary text-white py-5">
+    <div class="container py-4">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-3">
+                    Your One-Stop Career & Education Platform
+                </h1>
+                <p class="lead mb-4 opacity-90">
+                    Explore hundreds of career paths, discover personalized learning resources,
+                    and get tailored recommendations to reach your dream job.
+                </p>
+                <div class="d-flex flex-wrap gap-2">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'career-dashboard' %}" class="btn btn-light btn-lg px-4 fw-semibold">
+                            <i class="bi bi-speedometer2 me-2"></i>Go to Dashboard
+                        </a>
+                    {% else %}
+                        <a href="{% url 'register' %}" class="btn btn-light btn-lg px-4 fw-semibold">
+                            <i class="bi bi-rocket-takeoff me-2"></i>Get Started Free
+                        </a>
+                        <a href="{% url 'career-explore' %}" class="btn btn-outline-light btn-lg px-4">
+                            Explore Careers
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="bg-white bg-opacity-10 rounded-3 p-3 text-center">
+                            <i class="bi bi-briefcase-fill fs-1 mb-2"></i>
+                            <h4 class="fw-bold mb-0">{{ total_careers|default:"10+" }}</h4>
+                            <small>Career Paths</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="bg-white bg-opacity-10 rounded-3 p-3 text-center">
+                            <i class="bi bi-book-fill fs-1 mb-2"></i>
+                            <h4 class="fw-bold mb-0">{{ total_resources|default:"12+" }}</h4>
+                            <small>Learning Resources</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="bg-white bg-opacity-10 rounded-3 p-3 text-center">
+                            <i class="bi bi-people-fill fs-1 mb-2"></i>
+                            <h4 class="fw-bold mb-0">100%</h4>
+                            <small>Personalized</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="bg-white bg-opacity-10 rounded-3 p-3 text-center">
+                            <i class="bi bi-stars fs-1 mb-2"></i>
+                            <h4 class="fw-bold mb-0">Free</h4>
+                            <small>To Get Started</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center fw-bold mb-2">Everything You Need in One Place</h2>
+        <p class="text-center text-muted mb-5">From discovering your ideal career to finding the right courses — all personalized for you.</p>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 p-4 text-center">
+                    <div class="mx-auto mb-3 domain-icon" style="background:#ede9fe">
+                        <i class="bi bi-compass-fill text-primary fs-4"></i>
+                    </div>
+                    <h5 class="fw-bold">Explore Career Paths</h5>
+                    <p class="text-muted small">Browse careers across Technology, Business, Healthcare, Arts and more. Discover required skills, salary ranges, and growth outlook.</p>
+                    <a href="{% url 'career-explore' %}" class="btn btn-outline-primary btn-sm mt-auto">Explore Careers</a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 p-4 text-center">
+                    <div class="mx-auto mb-3 domain-icon" style="background:#dcfce7">
+                        <i class="bi bi-book-fill text-success fs-4"></i>
+                    </div>
+                    <h5 class="fw-bold">Curated Learning Resources</h5>
+                    <p class="text-muted small">Find hand-picked courses, certifications, and tutorials from top providers like Coursera, Udemy, and AWS. Many are free!</p>
+                    <a href="{% url 'education-resources' %}" class="btn btn-outline-success btn-sm mt-auto">Browse Resources</a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 p-4 text-center">
+                    <div class="mx-auto mb-3 domain-icon" style="background:#fef3c7">
+                        <i class="bi bi-person-check-fill text-warning fs-4"></i>
+                    </div>
+                    <h5 class="fw-bold">Personalized Recommendations</h5>
+                    <p class="text-muted small">Create your profile, add your skills and interests, and get personalized career paths and resource recommendations just for you.</p>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'career-profile' %}" class="btn btn-outline-warning btn-sm mt-auto">Update Profile</a>
+                    {% else %}
+                        <a href="{% url 'register' %}" class="btn btn-outline-warning btn-sm mt-auto">Create Profile</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Career Paths Preview -->
+{% if career_paths %}
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold mb-1">Popular Career Paths</h2>
+                <p class="text-muted mb-0">Trending careers with high growth potential</p>
+            </div>
+            <a href="{% url 'career-explore' %}" class="btn btn-outline-primary">View All <i class="bi bi-arrow-right ms-1"></i></a>
+        </div>
+        <div class="row g-4">
+            {% for career in career_paths %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-start gap-3 mb-3">
+                            <div class="domain-icon flex-shrink-0"
+                                 style="background:{% if career.domain == 'technology' %}#ede9fe{% elif career.domain == 'business' %}#dcfce7{% elif career.domain == 'arts' %}#fce7f3{% elif career.domain == 'finance' %}#fef3c7{% elif career.domain == 'healthcare' %}#dbeafe{% else %}#ffedd5{% endif %}">
+                                <i class="bi bi-{{ career.icon }}"
+                                   style="color:{% if career.domain == 'technology' %}#6d28d9{% elif career.domain == 'business' %}#166534{% elif career.domain == 'arts' %}#9d174d{% elif career.domain == 'finance' %}#92400e{% elif career.domain == 'healthcare' %}#1e40af{% else %}#9a3412{% endif %}"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-1">{{ career.title }}</h6>
+                                <span class="badge rounded-pill badge-{{ career.domain }} small">{{ career.get_domain_display }}</span>
+                            </div>
+                        </div>
+                        <p class="text-muted small mb-3" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">
+                            {{ career.description }}
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center small text-muted mb-3">
+                            <span><i class="bi bi-currency-dollar text-success"></i> {{ career.avg_salary }}</span>
+                        </div>
+                        <a href="{% url 'career-detail' career.pk %}" class="btn btn-sm btn-outline-primary w-100">Learn More</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Resources Preview -->
+{% if resources %}
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold mb-1">Top Learning Resources</h2>
+                <p class="text-muted mb-0">Courses and certifications from top providers</p>
+            </div>
+            <a href="{% url 'education-resources' %}" class="btn btn-outline-primary">View All <i class="bi bi-arrow-right ms-1"></i></a>
+        </div>
+        <div class="row g-4">
+            {% for resource in resources %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex gap-2 mb-2">
+                            <span class="badge {% if resource.is_free %}badge-free{% else %}badge-paid{% endif %} rounded-pill small">
+                                {% if resource.is_free %}Free{% else %}Paid{% endif %}
+                            </span>
+                            <span class="badge bg-light text-dark rounded-pill small">{{ resource.get_difficulty_display }}</span>
+                        </div>
+                        <h6 class="fw-bold mb-1">{{ resource.title }}</h6>
+                        <p class="text-muted small mb-1"><i class="bi bi-building me-1"></i>{{ resource.provider }}</p>
+                        <p class="text-muted small mb-3" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">
+                            {{ resource.description }}
+                        </p>
+                        {% if resource.duration %}
+                            <p class="small mb-3"><i class="bi bi-clock me-1 text-primary"></i>{{ resource.duration }}</p>
+                        {% endif %}
+                        {% if resource.url %}
+                            <a href="{{ resource.url }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary w-100">
+                                <i class="bi bi-box-arrow-up-right me-1"></i>View Resource
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- CTA Section -->
+{% if not user.is_authenticated %}
+<section class="py-5 bg-gradient-primary text-white">
+    <div class="container text-center py-3">
+        <h2 class="fw-bold mb-3">Ready to Start Your Journey?</h2>
+        <p class="lead mb-4 opacity-90">Create a free account to get personalized career and education recommendations.</p>
+        <a href="{% url 'register' %}" class="btn btn-light btn-lg px-5 fw-semibold">
+            <i class="bi bi-rocket-takeoff me-2"></i>Get Started Free
+        </a>
+    </div>
+</section>
+{% endif %}
+
+{% endblock %}

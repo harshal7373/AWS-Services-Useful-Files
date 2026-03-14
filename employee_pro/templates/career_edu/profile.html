@@ -1,0 +1,160 @@
+{% extends 'career_edu/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}<title>My Profile - CareerPath</title>{% endblock %}
+{% block nav_profile %}active{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Page Header -->
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <div class="domain-icon" style="background:#ede9fe;width:56px;height:56px;font-size:1.5rem">
+                    <i class="bi bi-person-fill" style="color:#6d28d9"></i>
+                </div>
+                <div>
+                    <h2 class="fw-bold mb-0">My Profile</h2>
+                    <p class="text-muted mb-0">Personalize your experience — the more you fill in, the better your recommendations.</p>
+                </div>
+            </div>
+
+            <!-- Profile Form -->
+            <div class="card p-4">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+
+                    <div class="row g-3 mb-4">
+                        <!-- Basic Info Section -->
+                        <div class="col-12">
+                            <h6 class="fw-bold text-uppercase text-muted small mb-3 border-bottom pb-2">
+                                <i class="bi bi-person me-1"></i>Basic Information
+                            </h6>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">{{ form.education_level.label }}</label>
+                            {{ form.education_level }}
+                            {% if form.education_level.errors %}
+                                <div class="invalid-feedback d-block">{{ form.education_level.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">{{ form.experience_level.label }}</label>
+                            {{ form.experience_level }}
+                            {% if form.experience_level.errors %}
+                                <div class="invalid-feedback d-block">{{ form.experience_level.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-semibold small">{{ form.target_role.label }}</label>
+                            {{ form.target_role }}
+                            {% if form.target_role.errors %}
+                                <div class="invalid-feedback d-block">{{ form.target_role.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-semibold small">{{ form.bio.label }}</label>
+                            {{ form.bio }}
+                            {% if form.bio.errors %}
+                                <div class="invalid-feedback d-block">{{ form.bio.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Skills Section -->
+                        <div class="col-12 mt-2">
+                            <h6 class="fw-bold text-uppercase text-muted small mb-3 border-bottom pb-2">
+                                <i class="bi bi-tools me-1"></i>Skills
+                            </h6>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-semibold small">{{ form.current_skills.label }}</label>
+                            {{ form.current_skills }}
+                            <div class="form-text">Enter your skills separated by commas (e.g., Python, Communication, Problem Solving)</div>
+                            {% if form.current_skills.errors %}
+                                <div class="invalid-feedback d-block">{{ form.current_skills.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Interests Section -->
+                        <div class="col-12 mt-2">
+                            <h6 class="fw-bold text-uppercase text-muted small mb-3 border-bottom pb-2">
+                                <i class="bi bi-star me-1"></i>Career Interests
+                            </h6>
+                            <p class="text-muted small mb-3">Select the career paths you're interested in to get personalized recommendations.</p>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="row g-2">
+                                {% for choice in form.interests %}
+                                <div class="col-sm-6 col-md-4">
+                                    <label class="border rounded-3 p-2 w-100 d-flex align-items-center gap-2 cursor-pointer" style="cursor:pointer">
+                                        {{ choice.tag }}
+                                        <span class="small">{{ choice.choice_label }}</span>
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% if form.interests.errors %}
+                                <div class="invalid-feedback d-block">{{ form.interests.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Social Links Section -->
+                        <div class="col-12 mt-2">
+                            <h6 class="fw-bold text-uppercase text-muted small mb-3 border-bottom pb-2">
+                                <i class="bi bi-link-45deg me-1"></i>Social Links (Optional)
+                            </h6>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">
+                                <i class="bi bi-linkedin me-1 text-primary"></i>{{ form.linkedin_url.label }}
+                            </label>
+                            {{ form.linkedin_url }}
+                            {% if form.linkedin_url.errors %}
+                                <div class="invalid-feedback d-block">{{ form.linkedin_url.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">
+                                <i class="bi bi-github me-1"></i>{{ form.github_url.label }}
+                            </label>
+                            {{ form.github_url }}
+                            {% if form.github_url.errors %}
+                                <div class="invalid-feedback d-block">{{ form.github_url.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="bi bi-check-lg me-1"></i>Save Profile
+                        </button>
+                        <a href="{% url 'career-dashboard' %}" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Add Bootstrap form-control/form-select classes to form widgets
+document.querySelectorAll('select:not(.form-check-input)').forEach(el => {
+    if (!el.classList.contains('form-select')) el.classList.add('form-select');
+});
+document.querySelectorAll('input[type="text"], input[type="url"], textarea').forEach(el => {
+    if (!el.classList.contains('form-control')) el.classList.add('form-control');
+});
+</script>
+{% endblock %}

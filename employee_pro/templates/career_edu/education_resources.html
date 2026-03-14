@@ -1,0 +1,138 @@
+{% extends 'career_edu/base.html' %}
+
+{% block title %}<title>Education Resources - CareerPath</title>{% endblock %}
+{% block nav_resources %}active{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+
+    <!-- Page Header -->
+    <div class="mb-4">
+        <h2 class="fw-bold mb-1">Education Resources</h2>
+        <p class="text-muted">Discover curated courses, certifications, and tutorials to accelerate your career.</p>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="card p-4 mb-4">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label fw-semibold small">Search</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" name="q" class="form-control border-start-0 ps-0" placeholder="Search resources, providers..." value="{{ search_query }}">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-semibold small">Domain</label>
+                <select name="domain" class="form-select">
+                    <option value="">All Domains</option>
+                    {% for value, label in domain_choices %}
+                        <option value="{{ value }}" {% if selected_domain == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-semibold small">Type</label>
+                <select name="type" class="form-select">
+                    <option value="">All Types</option>
+                    {% for value, label in resource_type_choices %}
+                        <option value="{{ value }}" {% if selected_type == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-semibold small">Difficulty</label>
+                <select name="difficulty" class="form-select">
+                    <option value="">All Levels</option>
+                    {% for value, label in difficulty_choices %}
+                        <option value="{{ value }}" {% if selected_difficulty == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end gap-2">
+                <button type="submit" class="btn btn-primary flex-grow-1">
+                    <i class="bi bi-funnel me-1"></i>Filter
+                </button>
+                {% if search_query or selected_domain or selected_type or selected_difficulty or free_only %}
+                    <a href="{% url 'education-resources' %}" class="btn btn-outline-secondary" title="Clear filters">
+                        <i class="bi bi-x"></i>
+                    </a>
+                {% endif %}
+            </div>
+            <div class="col-12">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="free" value="1" id="freeOnly" {% if free_only %}checked{% endif %} onchange="this.form.submit()">
+                    <label class="form-check-label small fw-semibold" for="freeOnly">
+                        <span class="badge badge-free rounded-pill me-1">Free</span> Show free resources only
+                    </label>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Results Count -->
+    <p class="text-muted small mb-3">
+        <strong>{{ resources|length }}</strong> resource{{ resources|length|pluralize }} found
+        {% if free_only %} <span class="badge badge-free rounded-pill ms-1">Free only</span>{% endif %}
+    </p>
+
+    <!-- Resource Cards -->
+    {% if resources %}
+    <div class="row g-4">
+        {% for resource in resources %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100">
+                <div class="card-body p-4 d-flex flex-column">
+                    <div class="d-flex flex-wrap gap-1 mb-2">
+                        <span class="badge {% if resource.is_free %}badge-free{% else %}badge-paid{% endif %} rounded-pill small">
+                            {% if resource.is_free %}<i class="bi bi-unlock-fill me-1"></i>Free{% else %}<i class="bi bi-lock-fill me-1"></i>Paid{% endif %}
+                        </span>
+                        <span class="badge bg-light text-dark rounded-pill small">{{ resource.get_difficulty_display }}</span>
+                        <span class="badge bg-light text-secondary rounded-pill small">{{ resource.get_resource_type_display }}</span>
+                    </div>
+
+                    <h5 class="fw-bold mb-1">{{ resource.title }}</h5>
+                    <p class="text-muted small mb-1">
+                        <i class="bi bi-building me-1"></i>{{ resource.provider }}
+                    </p>
+                    <span class="badge rounded-pill mb-3" style="font-size:.72rem;width:fit-content;background:{% if resource.domain == 'technology' %}#ede9fe{% elif resource.domain == 'business' %}#dcfce7{% elif resource.domain == 'arts' %}#fce7f3{% elif resource.domain == 'finance' %}#fef3c7{% elif resource.domain == 'healthcare' %}#dbeafe{% else %}#ffedd5{% endif %};color:{% if resource.domain == 'technology' %}#6d28d9{% elif resource.domain == 'business' %}#166534{% elif resource.domain == 'arts' %}#9d174d{% elif resource.domain == 'finance' %}#92400e{% elif resource.domain == 'healthcare' %}#1e40af{% else %}#9a3412{% endif %}">
+                        {{ resource.get_domain_display }}
+                    </span>
+
+                    <p class="text-muted small mb-3 flex-grow-1" style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">
+                        {{ resource.description }}
+                    </p>
+
+                    {% if resource.skills_list %}
+                    <div class="mb-3">
+                        <p class="small text-muted fw-semibold mb-1">Skills Covered</p>
+                        {% for skill in resource.skills_list|slice:":3" %}
+                            <span class="skill-tag">{{ skill }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    {% if resource.duration %}
+                        <p class="small mb-3"><i class="bi bi-clock me-1 text-primary"></i>{{ resource.duration }}</p>
+                    {% endif %}
+
+                    {% if resource.url %}
+                        <a href="{{ resource.url }}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm w-100 mt-auto">
+                            <i class="bi bi-box-arrow-up-right me-1"></i>Start Learning
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-book fs-1 text-muted d-block mb-3"></i>
+        <h5>No resources found</h5>
+        <p class="text-muted">Try adjusting your search or filter criteria.</p>
+        <a href="{% url 'education-resources' %}" class="btn btn-outline-primary">Clear Filters</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

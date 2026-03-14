@@ -1,0 +1,109 @@
+{% extends 'career_edu/base.html' %}
+
+{% block title %}<title>Explore Careers - CareerPath</title>{% endblock %}
+{% block nav_careers %}active{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+
+    <!-- Page Header -->
+    <div class="mb-4">
+        <h2 class="fw-bold mb-1">Explore Career Paths</h2>
+        <p class="text-muted">Discover the right career for you — browse roles, required skills, salary ranges, and growth outlook.</p>
+    </div>
+
+    <!-- Search & Filter Bar -->
+    <div class="card p-4 mb-4">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-5">
+                <label class="form-label fw-semibold small">Search</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" name="q" class="form-control border-start-0 ps-0" placeholder="Search careers, skills..." value="{{ search_query }}">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold small">Domain</label>
+                <select name="domain" class="form-select">
+                    <option value="">All Domains</option>
+                    {% for value, label in domain_choices %}
+                        <option value="{{ value }}" {% if selected_domain == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-funnel me-1"></i>Filter
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Results Count -->
+    <p class="text-muted small mb-3">
+        <strong>{{ careers|length }}</strong> career path{{ careers|length|pluralize }} found
+        {% if search_query %} for "<em>{{ search_query }}</em>"{% endif %}
+        {% if selected_domain %} in <strong>{{ selected_domain }}</strong>{% endif %}
+    </p>
+
+    <!-- Career Cards -->
+    {% if careers %}
+    <div class="row g-4">
+        {% for career in careers %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-start gap-3 mb-3">
+                        <div class="domain-icon flex-shrink-0"
+                             style="background:{% if career.domain == 'technology' %}#ede9fe{% elif career.domain == 'business' %}#dcfce7{% elif career.domain == 'arts' %}#fce7f3{% elif career.domain == 'finance' %}#fef3c7{% elif career.domain == 'healthcare' %}#dbeafe{% else %}#ffedd5{% endif %}">
+                            <i class="bi bi-{{ career.icon }}"
+                               style="color:{% if career.domain == 'technology' %}#6d28d9{% elif career.domain == 'business' %}#166534{% elif career.domain == 'arts' %}#9d174d{% elif career.domain == 'finance' %}#92400e{% elif career.domain == 'healthcare' %}#1e40af{% else %}#9a3412{% endif %}"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h5 class="fw-bold mb-1">{{ career.title }}</h5>
+                            <span class="badge rounded-pill small" style="background:{% if career.domain == 'technology' %}#ede9fe{% elif career.domain == 'business' %}#dcfce7{% elif career.domain == 'arts' %}#fce7f3{% elif career.domain == 'finance' %}#fef3c7{% elif career.domain == 'healthcare' %}#dbeafe{% else %}#ffedd5{% endif %};color:{% if career.domain == 'technology' %}#6d28d9{% elif career.domain == 'business' %}#166534{% elif career.domain == 'arts' %}#9d174d{% elif career.domain == 'finance' %}#92400e{% elif career.domain == 'healthcare' %}#1e40af{% else %}#9a3412{% endif %}">
+                                {{ career.get_domain_display }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <p class="text-muted small mb-3" style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">
+                        {{ career.description }}
+                    </p>
+
+                    <div class="mb-3">
+                        <p class="small fw-semibold mb-1 text-muted">Key Skills</p>
+                        {% for skill in career.skills_list|slice:":4" %}
+                            <span class="skill-tag">{{ skill }}</span>
+                        {% endfor %}
+                    </div>
+
+                    <div class="row g-2 small text-muted mb-3">
+                        <div class="col-6">
+                            <i class="bi bi-currency-dollar text-success"></i>
+                            <span>{{ career.avg_salary }}</span>
+                        </div>
+                        <div class="col-12">
+                            <i class="bi bi-graph-up text-primary"></i>
+                            <span>{{ career.growth_outlook }}</span>
+                        </div>
+                    </div>
+
+                    <a href="{% url 'career-detail' career.pk %}" class="btn btn-outline-primary btn-sm w-100">
+                        View Full Details <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-search fs-1 text-muted d-block mb-3"></i>
+        <h5>No careers found</h5>
+        <p class="text-muted">Try adjusting your search or filter criteria.</p>
+        <a href="{% url 'career-explore' %}" class="btn btn-outline-primary">Clear Filters</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
